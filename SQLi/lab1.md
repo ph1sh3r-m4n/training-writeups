@@ -1,47 +1,46 @@
-# 🗂️ PortSwigger Lab Writeup: SQL Injection Vulnerability in WHERE clause Allowing Retrieval of Hidden Data
+# PortSwigger Lab Writeup: SQL Injection Vulnerability in WHERE Clause Allowing Retrieval of Hidden Data
 
-## 🎯 Objective
-The objective of this lab is to exploit a **SQL injection vulnerability** in a web application where the application executes a SQL query with user-supplied input in an unsafe way to filter the products as well as show only released products, and our goal is to view all the hidden (unreleased) products through SQL injection.
+## Objective
+The objective of this laboratory exercise is to exploit an SQL injection vulnerability within a web application. The application executes a database query utilizing user-supplied input in an insecure manner to filter products and display only those that have been released. The goal is to retrieve all unreleased (hidden) products by executing an SQL injection attack.
 
 * **Lab URL**: [https://portswigger.net/web-security/sql-injection/lab-retrieve-hidden-data](https://portswigger.net/web-security/sql-injection/lab-retrieve-hidden-data)
 * **Category**: SQL Injection
 * **Difficulty**: Apprentice
 
-## 💉 Payloads Used
-* **Payload 1 (showed only hidden Gifts products)** - ❌
+## Payloads Utilized
+* **Payload 1 (Displays only hidden 'Gifts' products - Unsuccessful):**
   `Gifts'--`
-* **Payload 2 (showed all hidden products)** - ✅
+* **Payload 2 (Displays all hidden products - Successful):**
   `Gifts' or 1=1--`
 
-## 🧪 Exploitation Steps
+## Exploitation Methodology
 
-### 🕵️ Step 1: Observe the Website
-* Firstly open the lab URL in your browser, and observe what it is about and how it works.
-* At first glance, the website seems to be a shopping website with an option to filter products on different categories. In the lab description, it is mentioned that the vulnerability is in the filter parameter which is being used directly in a SQL query.
+### Step 1: Application Observation
+* Access the laboratory URL to observe the application's functionality.
+* The application operates as an e-commerce platform with a product filtering mechanism based on categories. The laboratory documentation indicates that the vulnerability resides within this filter parameter, which is directly concatenated into an SQL query.
 
-### 🔍 Step 2: Find the Vulnerable Endpoint
-* Click on any one of the filters to see how the website behaves and where the filter parameter is passed to the server.
-* Here, the site filters the products by supplying the category name in the URL - `/filter?category=...`
+### Step 2: Identification of the Vulnerable Endpoint
+* Interact with the filtering mechanism to observe the server's handling of the parameter.
+* The application filters products by appending the category name to the URL, specifically within the `/filter?category=...` parameter.
 
-### 🚀 Step 3: Inject the Payload
-* Based on the provided SQL query in the lab description, we can inject the `'--` along with the category name which will comment out the remaining SQL query - `AND released = 1`
-* Hence, we try our payload - `Gifts'--` which when executed will result in a query - `SELECT * FROM products WHERE category = 'Gifts'--` allowing us to view both released and unreleased products.
-* Hence, the payload worked and showed us the hidden product but still the lab was not solved because our task was to view all the hidden products of all types of categories instead of a specific one.
-* Therefore, we try another payload - `Gifts' or 1=1--` which when executed will result in a query - `SELECT * FROM products WHERE category = 'Gifts' or 1=1--` allowing us to view all hidden products.
-* The above query will always result in True for the `WHERE` clause, resulting in showing all the products without any condition.
-* And 💥 Booom!, We **got to see all the hidden products**.
-* And Finally, **the Lab is solved**.
+### Step 3: Payload Injection
+* Based on the SQL query structure provided in the laboratory description, it is possible to inject a comment sequence (`'--`) trailing the category name. This effectively neutralizes the remainder of the SQL query (specifically, the `AND released = 1` condition).
+* Injecting the initial payload, `Gifts'--`, results in the execution of the query: `SELECT * FROM products WHERE category = 'Gifts'--`. This permits the retrieval of both released and unreleased products within the 'Gifts' category.
+* While this payload exposes hidden products, it does not fulfill the laboratory requirements, which necessitate the retrieval of all hidden products across all categories.
+* Consequently, a secondary payload is required: `Gifts' or 1=1--`. Execution of this payload results in the query: `SELECT * FROM products WHERE category = 'Gifts' or 1=1--`.
+* The injected `OR 1=1` condition always evaluates to true, overriding the initial category constraint and neutralizing subsequent conditions via the comment indicator (`--`). This causes the database to return all product records without restriction.
+* Upon execution of this payload, all hidden products are successfully retrieved, completing the laboratory exercise.
 
-## 🧠 Conclusion
-* This lab involves **a very basic case of SQL injection vulnerability**, where the category parameter is used to filter products **where the application directly concatenates the user-supplied category in the SQL query to fetch only the relevant products and also currently released to the public**.
-* Since the application neither validates the user-input nor uses prepared statements, **an attacker can manipulate the SQL query by injecting any arbitrary SQL commands to gain full access to the database.**
-* By injecting `' or 1=1--` in the category parameter, we are able to manipulate the SQL query and view the hidden products.
+## Conclusion
+* This laboratory demonstrates a fundamental SQL injection vulnerability where user-supplied input via a category parameter is directly concatenated into a backend SQL query without sanitization or parameterization.
+* Due to the absence of input validation and prepared statements, malicious actors can manipulate the query structure to execute arbitrary SQL commands and achieve unauthorized database access.
+* By injecting the payload `' or 1=1--` into the category parameter, the query logic is successfully manipulated to disclose unauthorized information.
 
-## 🧾 Related CWEs
+## Related Common Weakness Enumerations (CWEs)
 
 | CWE ID | Title | Description |
 | :--- | :--- | :--- |
 | CWE-89 | **Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')** | Application fails to properly sanitize user input before using it in SQL queries. |
-| CWE-20 | **Improper Input Validation** | The app does not validate user input properly, allowing malicious input to influence behavior. |
+| CWE-20 | **Improper Input Validation** | The application does not validate user input properly, allowing malicious input to influence behavior. |
 | CWE-713 | **Owning Dangerous Functionality Without Adequate Security Controls** | SQL capabilities are exposed without secure controls. |
 | CWE-116 | **Improper Encoding or Escaping of Output** | Failure to safely encode input before inserting it into SQL queries. |

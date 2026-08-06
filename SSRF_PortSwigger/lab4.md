@@ -37,4 +37,7 @@ stockApi=http://localhost:80%2523@stock.weliketoshop.net/admin/delete?username=c
 
 Append a # to the username and observe that the URL is now rejected.
 Double-URL encode the # to %2523 and observe the extremely suspicious "Internal Server Error" response, indicating that the server may have attempted to connect to "username".
+
+### NOTE:-
+The fragment `#` is discarded after URL parsing and only the localhost loopback reqeust is sent over to the server to continue the SSRF attack.
 > LAB SOLVED

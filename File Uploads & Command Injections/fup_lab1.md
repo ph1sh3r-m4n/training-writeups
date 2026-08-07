@@ -11,6 +11,7 @@ You can log in to your own account using the following credentials: wiener:peter
 
 
 ```
+## SOLUTION
 
 Basic file upload vuln with 0 checks.  
 Just upload malicious `.php` file.

@@ -8,8 +8,8 @@ To solve the lab, modify and sign a JWT that gives you access to the admin panel
 You can log in to your own account using the following credentials: wiener:peter
 ```
 ## SOLUTION
-So in this we had to make our custom `jwk` which the vulnerable server used.  
-I generated a new RSA key of my own and use it to sign the payl;oad as I wished. I changed the `kid` to the same one as the forged `jwk` field and escalated the server to get admin privileges.  
+So in this we had to make our custom `jwk` which the vulnerable server used as the key as instead of the one already configured.  
+I generated a new RSA key of my own and use it to sign the malicious payload as I wished. I changed the `kid` to the same one as the forged `jwk` field and escalated the server to get admin privileges.  
 Just run the og method to delete our friend _Carlos_ from the admin panel.
 ## REQUEST BODY
 

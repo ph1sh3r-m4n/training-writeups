@@ -369,45 +369,4 @@ Account-linking CSRF
 
 The missing `state` parameter allows an attacker-controlled OAuth flow to be completed in another user's authenticated session.
 
----
-
-# Attack Classification
-
-This vulnerability can be described as:
-
-* **OAuth account-linking CSRF**
-* **OAuth CSRF**
-* **Login CSRF**
-* Potentially **account takeover**
-
-The `<iframe>` itself is not the vulnerability.
-
-It is simply the mechanism used to cause the victim's browser to make the request automatically.
-
----
-
-# One-Minute Summary
-
-```text
-1. Log into your own blog account.
-2. Link your own social-media account.
-3. Start the linking process again.
-4. Intercept /oauth-linking?code=...
-5. Copy the URL.
-6. Drop the request so the code remains unused.
-7. Put the URL inside an iframe on the exploit server.
-8. Deliver the exploit to the victim.
-9. The victim is the admin and is already logged into the blog.
-10. The admin's browser loads the iframe.
-11. Your social account becomes linked to the admin's blog account.
-12. Log out.
-13. Choose "Log in with social media".
-14. You are authenticated as admin.
-15. Access /admin and delete carlos.
-```
-
-## Root Cause
-
-The application fails to bind the OAuth authorization flow to the user's session using the `state` parameter.
-
 A secure implementation should generate an unpredictable `state` value when starting the OAuth flow, store it in the user's session, and verify it when the OAuth callback is received.
